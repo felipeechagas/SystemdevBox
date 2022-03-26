@@ -170,7 +170,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                     //habilita o botão Adicionar
                     btnAdicionar.setEnabled(true);
                     btnAlterar.setEnabled(false);
-                    btnDeletar.setEnabled(false);
+                    
                 }
             } catch (Exception error) {
                 JOptionPane.showMessageDialog(null, error);
