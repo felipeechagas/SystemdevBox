@@ -229,6 +229,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         setClosable(true);
         setIconifiable(true);
         setMaximizable(true);
+        setTitle("Tela de Clientes");
         setPreferredSize(new java.awt.Dimension(635, 465));
 
         jLabel1.setText("* Campos Obrigatórios");
