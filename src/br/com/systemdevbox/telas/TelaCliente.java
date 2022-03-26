@@ -7,6 +7,7 @@ package br.com.systemdevbox.telas;
 import java.sql.*;
 import br.com.systemdevbox.dao.ModuloConexao;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 //Importar recursos da biblioteca rs2xml.jar
 import net.proteanit.sql.DbUtils;
 
@@ -50,14 +51,8 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                 if (adicionado > 0) {
                     JOptionPane.showMessageDialog(null, "Cliente adicionado com sucesso!");
 
-                    //Limpar os campos
-                    txtNomeCli.setText(null);
-                    txtCpfCli.setText(null);
-                    txtEndClli.setText(null);
-                    txtBairroCli.setText(null);
-                    txtCidadeCli.setText(null);
-                    txtFoneCli.setText(null);
-                    txtEmailCli.setText(null);
+                    //chamando o método Limpar os campos
+                    limpar();
 
                 }
             }
@@ -68,7 +63,8 @@ public class TelaCliente extends javax.swing.JInternalFrame {
 
     //Método pesquisar clientes pelo nome com filtro
     private void pesquisar_cliente() {
-        String sql = "select * from tbclientes where nomeCli like ?";
+        //Query para criar apelido para o titulo das colunas
+        String sql = "select idcli as id, nomecli as nome, cpfcli as cpf, endclli as endereço, bairrocli as bairro, cidadecli as cidade, fonecli as telefone, emailcli as email from tbclientes where nomeCli like ?";
         try {
             pst = conexao.prepareStatement(sql);
 
@@ -96,7 +92,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         txtCidadeCli.setText(tblClientes.getModel().getValueAt(setar, 5).toString());
         txtFoneCli.setText(tblClientes.getModel().getValueAt(setar, 6).toString());
         txtEmailCli.setText(tblClientes.getModel().getValueAt(setar, 7).toString());
-        
+
         //Desabilita o botão adicionar
         btnAdicionar.setEnabled(false);
     }
@@ -114,7 +110,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
             pst.setString(6, txtFoneCli.getText());
             pst.setString(7, txtEmailCli.getText());
             pst.setString(8, txtCliId.getText());
-            
+
             //validação dos campos obrigatórios
             if ((txtNomeCli.getText().isEmpty()) || (txtCpfCli.getText().isEmpty()) || (txtFoneCli.getText().isEmpty()) || (txtEndClli.getText().isEmpty()) || (txtBairroCli.getText().isEmpty()) || (txtCidadeCli.getText().isEmpty()) || (txtEmailCli.getText().isEmpty())) {
                 JOptionPane.showMessageDialog(null, "Preencha todos os campos obrigatórios!");
@@ -126,14 +122,8 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                     JOptionPane.showMessageDialog(null, "Dados do cliente alterado com sucesso!");
 
                     //Limpar os campos
-                    txtNomeCli.setText(null);
-                    txtCpfCli.setText(null);
-                    txtEndClli.setText(null);
-                    txtBairroCli.setText(null);
-                    txtCidadeCli.setText(null);
-                    txtFoneCli.setText(null);
-                    txtEmailCli.setText(null);
-                    
+                    limpar();
+
                     //habilita o botão Adicionar
                     btnAdicionar.setEnabled(true);
                 }
@@ -142,31 +132,25 @@ public class TelaCliente extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, error);
         }
     }
-    
-    private void deletar(){
-        
+
+    private void deletar() {
+
         //Estrutura confirma a remoção do Clientes
         int confirma = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja remover este cliente", "Atenção", JOptionPane.YES_NO_OPTION);
-        
-        if(confirma == JOptionPane.YES_NO_OPTION){
-            String sql="delete from tbclientes where idcli=?";
+
+        if (confirma == JOptionPane.YES_NO_OPTION) {
+            String sql = "delete from tbclientes where idcli=?";
             try {
-                pst=conexao.prepareStatement(sql);
+                pst = conexao.prepareStatement(sql);
                 pst.setString(1, txtCliId.getText());
                 //variável para que possa ser utilizado na condição postivia.
                 int apagado = pst.executeUpdate();
-                //Condição para exibit mensagem ao usuário
-                if (apagado>0){
+                //Condição para exibir mensagem ao usuário
+                if (apagado > 0) {
                     JOptionPane.showMessageDialog(null, "Cliente removido com sucesso!");
                     //Limpar os campos
-                    txtNomeCli.setText(null);
-                    txtCpfCli.setText(null);
-                    txtEndClli.setText(null);
-                    txtBairroCli.setText(null);
-                    txtCidadeCli.setText(null);
-                    txtFoneCli.setText(null);
-                    txtEmailCli.setText(null);
-                    
+                    limpar();
+
                     //habilita o botão Adicionar
                     btnAdicionar.setEnabled(true);
                     btnAlterar.setEnabled(false);
@@ -175,9 +159,23 @@ public class TelaCliente extends javax.swing.JInternalFrame {
             } catch (Exception error) {
                 JOptionPane.showMessageDialog(null, error);
             }
-        } 
+        }
     }
-    
+
+    //método para limpar os campos do formulário
+    private void limpar() {
+        txtCliPesquisar.setText(null);
+        txtCliId.setText(null);
+        txtNomeCli.setText(null);
+        txtCpfCli.setText(null);
+        txtEndClli.setText(null);
+        txtBairroCli.setText(null);
+        txtCidadeCli.setText(null);
+        txtFoneCli.setText(null);
+        txtEmailCli.setText(null);
+        //limpar os campos da tabela
+        ((DefaultTableModel)tblClientes.getModel()).setRowCount(0);
+    }
 
     /**
      * Esse método é chamado de dentro do construtor para inicializar o
@@ -258,17 +256,24 @@ public class TelaCliente extends javax.swing.JInternalFrame {
             }
         });
 
+        tblClientes = new javax.swing.JTable(){
+            public boolean isCellEditable(int rowIndex, int colIndex){
+                return false;
+            }
+        };
         tblClientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Nome", "CPF", "Telefone", "Endereço", "Bairro", "Cidade", "E-mail"
             }
         ));
+        tblClientes.setFocusable(false);
+        tblClientes.getTableHeader().setReorderingAllowed(false);
         tblClientes.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblClientesMouseClicked(evt);
