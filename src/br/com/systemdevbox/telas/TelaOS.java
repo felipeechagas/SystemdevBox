@@ -2,7 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JInternalFrame.java to edit this template
  */
+//Importar classes e bibliotecas necessárias
 package br.com.systemdevbox.telas;
+
+import java.sql.*;
+import br.com.systemdevbox.dao.ModuloConexao;
+import javax.swing.JOptionPane;
+import net.proteanit.sql.DbUtils;
 
 /**
  *
@@ -10,12 +16,45 @@ package br.com.systemdevbox.telas;
  */
 public class TelaOS extends javax.swing.JInternalFrame {
 
+    //criar algumas variaveis usando as classes necessarias para conectar, executar e trazer dados do Mysql
+    Connection conexao = null;
+    PreparedStatement pst = null;
+    ResultSet rs = null;
+
     /**
      * Creates new form TelaOS
      */
     public TelaOS() {
+        //chamando método conector e atribuir a variavel conexao
         initComponents();
+        conexao = ModuloConexao.conector();
     }
+    
+    //criando método Pesquisar Cliente
+    private void pesquisar_cliente(){
+        String sql = "Select idcli as id, nomecli as Nome, fonecli as Fone from tbclientes where nomecli like ?";
+        try {
+            pst = conexao.prepareStatement(sql);
+            pst.setString(1, txtCliPesquisar.getText() + "%");
+            //executar a instrução sql e atribuir o resultado a variavel rs
+            rs = pst.executeQuery();
+            //Utilizar biblioteca  rs2xml.jar para preencher a tabela
+            tblClientes.setModel(DbUtils.resultSetToTableModel(rs));
+            
+        } catch (Exception error) {
+            JOptionPane.showMessageDialog(null, error);
+        }
+    }
+    
+    //Criando Metodo setar campos
+    private void setar_campos(){
+       int setar = tblClientes.getSelectedRow();
+       txtCliId.setText(tblClientes.getModel().getValueAt(setar, 0).toString());
+    }
+    
+    
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -144,11 +183,22 @@ public class TelaOS extends javax.swing.JInternalFrame {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Cliente"));
 
+        txtCliPesquisar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtCliPesquisarActionPerformed(evt);
+            }
+        });
+        txtCliPesquisar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtCliPesquisarKeyReleased(evt);
+            }
+        });
+
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/systemdevbox/icones/Search.png"))); // NOI18N
 
         jLabel5.setText("* Id");
 
-        txtCliId.setEditable(false);
+        txtCliId.setEnabled(false);
 
         tblClientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -161,6 +211,11 @@ public class TelaOS extends javax.swing.JInternalFrame {
                 "Id", "Nome", "Telefone"
             }
         ));
+        tblClientes.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblClientesMouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(tblClientes);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -345,6 +400,21 @@ public class TelaOS extends javax.swing.JInternalFrame {
     private void btnOsAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOsAlterarActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnOsAlterarActionPerformed
+
+    private void txtCliPesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCliPesquisarActionPerformed
+        // chamando metodo pesquisar clientes
+        
+    }//GEN-LAST:event_txtCliPesquisarActionPerformed
+
+    private void txtCliPesquisarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCliPesquisarKeyReleased
+        // chamando metodo pesquisar clientes
+        pesquisar_cliente();
+    }//GEN-LAST:event_txtCliPesquisarKeyReleased
+
+    private void tblClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblClientesMouseClicked
+        // chamando método setar campos
+        setar_campos();
+    }//GEN-LAST:event_tblClientesMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
